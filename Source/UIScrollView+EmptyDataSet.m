@@ -90,7 +90,7 @@ static char const * const kEmptyDataSetView =       "emptyDataSetView";
     if (!view)
     {
         view = [DZNEmptyDataSetView new];
-        view.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+//        view.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         view.hidden = YES;
         
         view.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dzn_didTapContentView:)];
@@ -449,6 +449,8 @@ static char const * const kEmptyDataSetView =       "emptyDataSetView";
         DZNEmptyDataSetView *view = self.emptyDataSetView;
         
         if (!view.superview) {
+            view.translatesAutoresizingMaskIntoConstraints = false;
+            
             // Send the view all the way to the back, in case a header and/or footer is present, as well as for sectionHeaders or any other content
             if (([self isKindOfClass:[UITableView class]] || [self isKindOfClass:[UICollectionView class]]) && self.subviews.count > 1) {
                 [self insertSubview:view atIndex:0];
@@ -456,6 +458,9 @@ static char const * const kEmptyDataSetView =       "emptyDataSetView";
             else {
                 [self addSubview:view];
             }
+            
+            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[view(==parent)]|" options:0 metrics:nil views:@{@"view": view, @"parent": self}]];
+            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view(==parent)]|" options:0 metrics:nil views:@{@"view": view, @"parent": self}]];
         }
         
         // Removing view resetting the view and its constraints it very important to guarantee a good state
@@ -925,6 +930,7 @@ Class dzn_baseClassToSwizzleForTarget(id target)
     [self addConstraint:centerXConstraint];
     [self addConstraint:centerYConstraint];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[contentView]|" options:0 metrics:nil views:@{@"contentView": self.contentView}]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[contentView]|" options:0 metrics:nil views:@{@"contentView": self.contentView}]];
     
     // When a custom offset is available, we adjust the vertical constraints' constants
     if (self.verticalOffset != 0 && self.constraints.count > 0) {
